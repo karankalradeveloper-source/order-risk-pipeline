@@ -1,0 +1,15 @@
+services:
+  order-risk-pipeline-db:
+    image: postgres:15.19
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=unixbox
+      - POSTGRES_DB=order_risk_pipeline_db
+      - POSTGRES_USER=adminuser
+      - TZ=Asia/Kolkata
+    volumes:
+      - order_risk_pipeline_db_volume:/var/lib/postgresql/data
+
+volumes:
+  order_risk_pipeline_db_volume:
