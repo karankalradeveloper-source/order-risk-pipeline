@@ -3,6 +3,7 @@ package com.karankalra.order_risk_pipeline.service;
 import com.karankalra.order_risk_pipeline.entity.Order;
 import com.karankalra.order_risk_pipeline.enums.RiskStatus;
 import com.karankalra.order_risk_pipeline.model.CreateOrderRequestDTO;
+import com.karankalra.order_risk_pipeline.model.OrderCreationResult;
 import com.karankalra.order_risk_pipeline.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,10 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public Order createOrder(CreateOrderRequestDTO orderRequest) {
-        Optional<Order> order = orderRepository.findByOrderId(orderRequest.getOrderId());
-        if(order.isPresent()) {
-            return order.get();
+    public OrderCreationResult createOrder(CreateOrderRequestDTO orderRequest) {
+        Optional<Order> existingOrder = orderRepository.findByOrderId(orderRequest.getOrderId());
+        if(existingOrder.isPresent()) {
+            return new OrderCreationResult(existingOrder.get(), false);
         }
         Order newOrder = Order.builder()
                 .orderId(orderRequest.getOrderId())
@@ -30,6 +31,7 @@ public class OrderService {
                 .shippingAddress(orderRequest.getShippingAddress())
                 .riskStatus(RiskStatus.PENDING)
                 .build();
-        return orderRepository.save(newOrder);
+        Order savedOrder = orderRepository.save(newOrder);
+        return new OrderCreationResult(savedOrder, true);
     }
 }
